@@ -1,57 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>GL Light</title>
+    <title>PA#3</title>
     <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            background-color: #EEEEEE;
-        }
-        #canvas-holder {
-            width: 600px;
-            margin: 0 auto;
-            background-color: white;
-        }
-        canvas { 
-            display: block;
-            width: 600px;
-            height: 600px;
-            background-color: white;
-        }
-        .controls {
-            width: 600px;
-            margin: 20px auto;
-            padding: 10px;
-            background-color: white;
-            border: 1px solid #ccc;
-        }
-        .slider-container {
-            margin: 10px 0;
-        }
-        label {
-            display: inline-block;
-            width: 150px;
-        }
+        body { margin: 0; }
+        canvas { width: 600px; height: 600px; display: block; }
     </style>
 </head>
-<body>
-    <div class="controls">
-        <div class="slider-container">
-            <label>U divisions: <span id="uValue">30</span></label>
-            <input type="range" id="uSlider" min="4" max="100" value="30">
-        </div>
-        <div class="slider-container">
-            <label>V divisions: <span id="vValue">30</span></label>
-            <input type="range" id="vSlider" min="4" max="100" value="30">
-        </div>
-    </div>
+<body onload="init()">
+    <h2>A Cube with Trackball Mouse Rotation</h2>
+    <p>Drag your mouse on the cube to rotate it.<br>
+    (On a touch screen, you can use your finger.)</p>
     <div id="canvas-holder">
-        <canvas id="webglcanvas" width="600" height="600"></canvas>
+        <canvas id="webglcanvas" width="1000" height="1000"></canvas>
     </div>
-    <script src="Utils/m4.js"></script>
+
+    <script src="./Utils/m4.js"></script>
+    <script src="./Utils/trackball-rotator.js"></script>
     <script src="shader.gpu"></script>
+    <script src="TextureHandler.js"></script>
     <script src="Model.js"></script>
     <script src="main.js"></script>
 </body>
