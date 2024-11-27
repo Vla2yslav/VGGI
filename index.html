@@ -1,15 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PA#3</title>
+    <title>Calculation and graphics work</title>
     <style>
         body { margin: 0; }
         canvas { width: 600px; height: 600px; display: block; }
     </style>
 </head>
 <body>
-    <canvas id="webglcanvas" width="600" height="600"></canvas>
-
+    <div id="canvas-holder">
+        <canvas id="webglcanvas" width="1000" height="1000"></canvas>
+        <div id="controls">
+            <p>Controls:</p>
+            <p>W/S - Move scaling point up/down (v coordinate)</p>
+            <p>A/D - Move scaling point left/right (u coordinate)</p>
+            <p>+/- - Increase/decrease texture scale</p>
+            <p>Mouse drag - Rotate model</p>
+        </div>
+    </div>
     <script src="./Utils/m4.js"></script>
     <script src="./Utils/trackball-rotator.js"></script>
     <script type="module" src="./js/main.js"></script>
