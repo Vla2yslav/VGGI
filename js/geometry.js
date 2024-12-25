@@ -5,31 +5,32 @@ export function CreateSurfaceData(data, scalePoint = { u: 0.5, v: 0.5 }, scaleFa
     const normals = [];
     const indices = [];
 
-    const a = 1.0;
-    const b = 0.8;
-    const c = 0.6;
+    const H = 0.25;
+    const c = 1.0;
+    const alpha = 0.033 * Math.PI; 
+    const p = 8 * Math.PI;         
+    const theta0 = 0;       
+    const tgz = Math.tan(alpha);     
 
     for (let i = 0; i <= segments; i++) {
-        const phi = (i * Math.PI) / segments;
-        const sinPhi = Math.sin(phi);
-        const cosPhi = Math.cos(phi);
-
+        const u = -1.0 + (2.0 * i) / segments;
+        
         for (let j = 0; j <= segments; j++) {
-            const theta = (j * 2 * Math.PI) / segments;
-            const sinTheta = Math.sin(theta);
-            const cosTheta = Math.cos(theta);
-
-            const x = a * cosTheta * sinPhi * (1 + 0.2 * Math.sin(3 * theta));
-            const y = b * sinTheta * sinPhi * (1 + 0.2 * Math.sin(3 * theta));
-            const z = c * cosPhi;
+            const v = -5.0 + (10.0 * j) / segments;
+            const phi = 0;
+            const theta = p * u + theta0;
+            
+            const x = c * u + v * (Math.sin(phi) + tgz * Math.cos(phi) * Math.cos(theta));
+            const y = v * tgz * Math.sin(theta);
+            const z = H + v * (tgz * Math.sin(phi) * Math.cos(theta) - Math.cos(phi));
 
             vertices.push(x, y, z);
 
-            const u = j / segments;
-            const v = i / segments;
+            const texU = j / segments;
+            const texV = i / segments;
             
-            const du = u - scalePoint.u;
-            const dv = v - scalePoint.v;
+            const du = texU - scalePoint.u;
+            const dv = texV - scalePoint.v;
             
             const scaledU = scalePoint.u + du * scaleFactor;
             const scaledV = scalePoint.v + dv * scaleFactor;
@@ -39,9 +40,14 @@ export function CreateSurfaceData(data, scalePoint = { u: 0.5, v: 0.5 }, scaleFa
             
             texcoords.push(wrappedU, wrappedV);
 
-            const nx = x / a;
-            const ny = y / b;
-            const nz = z / c;
+            const dx = c + tgz * Math.cos(phi) * Math.cos(theta);
+            const dy = tgz * Math.sin(theta);
+            const dz = tgz * Math.sin(phi) * Math.cos(theta) - Math.cos(phi);
+            
+            const nx = dy * 1 - 0 * dz;
+            const ny = 0 * dx - 1 * dz;
+            const nz = 1 * dy - dy * 1;
+            
             const length = Math.sqrt(nx * nx + ny * ny + nz * nz);
             normals.push(nx / length, ny / length, nz / length);
         }
