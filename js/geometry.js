@@ -5,34 +5,49 @@ export function CreateSurfaceData(data) {
     const normals = [];
     const indices = [];
 
-    const a = 1.0;  // x-axis
-    const b = 0.8;  // y-axis
-    const c = 0.6;  // z-axis
+    const H = 0.25;
+    const c = 1.0;
+    const alpha = 0.033 * Math.PI; 
+    const p = 8 * Math.PI;         
+    const theta0 = 0;                
+
+    const uMin = 0, uMax = 1;
+    const vMin = -5, vMax = 5;
 
     for (let i = 0; i <= segments; i++) {
-        const phi = (i * Math.PI) / segments;
-        const sinPhi = Math.sin(phi);
-        const cosPhi = Math.cos(phi);
-
+        const u = uMin + (i * (uMax - uMin)) / segments;
+        
         for (let j = 0; j <= segments; j++) {
-            const theta = (j * 2 * Math.PI) / segments;
-            const sinTheta = Math.sin(theta);
-            const cosTheta = Math.cos(theta);
-
-            // Trochoidal ellipsoid equations
-            const x = a * cosTheta * sinPhi * (1 + 0.2 * Math.sin(3 * theta));
-            const y = b * sinTheta * sinPhi * (1 + 0.2 * Math.sin(3 * theta));
-            const z = c * cosPhi;
+            const v = vMin + (j * (vMax - vMin)) / segments;
+            
+            const theta = p * u + theta0;
+            const tgAlpha = Math.tan(alpha);
+            
+            const x = c * u + v * tgAlpha * Math.cos(theta);
+            const y = v * tgAlpha * Math.sin(theta);
+            const z = H - v;
 
             vertices.push(x, y, z);
             texcoords.push(j / segments, i / segments);
 
-            // Normal calculation
-            const nx = x / a;
-            const ny = y / b;
-            const nz = z / c;
+            const dx_du = c - v * tgAlpha * Math.sin(theta) * p;
+            const dy_du = v * tgAlpha * Math.cos(theta) * p;
+            const dz_du = 0;
+
+            const dx_dv = tgAlpha * Math.cos(theta);
+            const dy_dv = tgAlpha * Math.sin(theta);
+            const dz_dv = -1;
+
+            const nx = dy_du * dz_dv - dz_du * dy_dv;
+            const ny = dz_du * dx_dv - dx_du * dz_dv;
+            const nz = dx_du * dy_dv - dy_du * dx_dv;
+
             const length = Math.sqrt(nx * nx + ny * ny + nz * nz);
-            normals.push(nx / length, ny / length, nz / length);
+            if (length > 0) {
+                normals.push(nx / length, ny / length, nz / length);
+            } else {
+                normals.push(0, 0, 1);
+            }
         }
     }
 
@@ -69,17 +84,16 @@ function calculateTangentsAndBitangents(vertices, texcoords, normals, indices, d
             tangent = [0, 1, 0];
         }
 
-        // Gram-Schmidt orthogonalization
-        let dot = normal[0]*tangent[0] + normal[1]*tangent[1] + normal[2]*tangent[2];
+        const dot = normal[0]*tangent[0] + normal[1]*tangent[1] + normal[2]*tangent[2];
         tangent[0] = tangent[0] - normal[0]*dot;
         tangent[1] = tangent[1] - normal[1]*dot;
         tangent[2] = tangent[2] - normal[2]*dot;
 
-        // Normalize tangent
-        let length = Math.sqrt(tangent[0]*tangent[0] + tangent[1]*tangent[1] + tangent[2]*tangent[2]);
-        tangent = tangent.map(x => x/length);
+        const tangentLength = Math.sqrt(tangent[0]*tangent[0] + tangent[1]*tangent[1] + tangent[2]*tangent[2]);
+        if (tangentLength > 0) {
+            tangent = tangent.map(x => x/tangentLength);
+        }
 
-        // Calculate bitangent
         const bitangent = [
             normal[1]*tangent[2] - normal[2]*tangent[1],
             normal[2]*tangent[0] - normal[0]*tangent[2],
